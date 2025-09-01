@@ -208,11 +208,3 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-## 🙏 Acknowledgments
-
-- **[Ultralytics](https://github.com/ultralytics/ultralytics)** - YOLOv11 implementation
-- **[OpenCV](https://opencv.org/)** - Computer vision library
-- **[PyTorch](https://pytorch.org/)** - Deep learning framework
-
----
-
