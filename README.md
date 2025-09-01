@@ -141,11 +141,11 @@ The system provides real-time information including:
 ## 🔬 Technical Details
 
 ### Models Required
-- **Plate Detection Model**: YOLOv8 trained for license plate detection
-- **Character Recognition Model**: YOLOv8 trained for character classification
+- **Plate Detection Model**: YOLOv11 trained for license plate detection
+- **Character Recognition Model**: YOLOv11 trained for character classification
 
 ### Dependencies
-- `ultralytics`: YOLOv8 framework
+- `ultralytics`: YOLOv11 framework
 - `opencv-python`: Computer vision operations
 - `numpy`: Numerical computations
 - `tempfile`: Temporary file handling
@@ -158,5 +158,5 @@ The system provides real-time information including:
 
 ## 📄 License
 
-This project is open source. Please ensure you have proper licensing for the YOLOv8 models used.
+This project is open source. Please ensure you have proper licensing for the YOLOv11 models used.
 
