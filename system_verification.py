@@ -311,8 +311,8 @@ def main():
         print_flush(f"\n⚠️  System needs attention ({success_rate:.0f}% tests passed)")
         print_flush("❌ Please resolve the failed tests before proceeding.")
     
-    print_flush("\n📚 Documentation: https://github.com/GaruVA/Vehicle-License-Plate-Recognition")
-    print_flush("🐛 Report issues: https://github.com/GaruVA/Vehicle-License-Plate-Recognition/issues")
+    print_flush("\n📚 Documentation: https://github.com/GaruVA/vehicle-license-plate-recognition")
+    print_flush("🐛 Report issues: https://github.com/GaruVA/vehicle-license-plate-recognition/issues")
     
     return success_rate >= 80
 

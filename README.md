@@ -27,8 +27,8 @@ A real-time **Vehicle License Plate Recognition** system built with **YOLOv8** a
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/GaruVA/Vehicle-License-Plate-Recognition.git
-cd Vehicle-License-Plate-Recognition
+git clone https://github.com/GaruVA/vehicle-license-plate-recognition.git
+cd vehicle-license-plate-recognition
 ```
 
 ### 2. Run Installation Script
@@ -195,9 +195,9 @@ python test_setup.py
 - Verify model file integrity
 
 ### Getting Help
-- 📖 **Wiki**: [GitHub Wiki](https://github.com/GaruVA/Vehicle-License-Plate-Recognition/wiki)
-- 🐛 **Issues**: [Report Bug](https://github.com/GaruVA/Vehicle-License-Plate-Recognition/issues)
-- 💬 **Discussions**: [Community Forum](https://github.com/GaruVA/Vehicle-License-Plate-Recognition/discussions)
+- 📖 **Wiki**: [GitHub Wiki](https://github.com/GaruVA/vehicle-license-plate-recognition/wiki)
+- 🐛 **Issues**: [Report Bug](https://github.com/GaruVA/vehicle-license-plate-recognition/issues)
+- 💬 **Discussions**: [Community Forum](https://github.com/GaruVA/vehicle-license-plate-recognition/discussions)
 
 ---
 
@@ -243,7 +243,7 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 ### Development Setup
 ```bash
 # Fork and clone the repository
-git clone https://github.com/your-username/Vehicle-License-Plate-Recognition.git
+git clone https://github.com/your-username/vehicle-license-plate-recognition.git
 
 # Create development branch
 git checkout -b feature/your-feature-name
