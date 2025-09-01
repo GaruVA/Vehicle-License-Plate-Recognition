@@ -1,25 +1,21 @@
-# 🚗 YOLOv8 Vehicle License Plate Recognition (VLPR)
+# 🚗 Vehicle License Plate Recognition (VLPR)
 
-A real-time **Vehicle License Plate Recognition** system built with **YOLOv8** and **OpenCV**, supporting both local video files and **IP camera streams** (RTSP/HTTP). Optimized for **Linux**, **Raspberry Pi**, and **embedded systems**.
+A real-time **Vehicle License Plate Recognition** system built with **YOLOv11** and **OpenCV**, supporting both local video files and **IP camera streams** (RTSP/HTTP). Optimized for **Linux**, **Raspberry Pi**, and **embedded systems**.
 
 ![License Plate Detection Demo](https://img.shields.io/badge/Status-Active-brightgreen)
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![YOLOv8](https://img.shields.io/badge/YOLOv8-Ultralytics-orange.svg)
+![YOLOv11](https://img.shields.io/badge/YOLOv11-Ultralytics-orange.svg)
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.8+-green.svg)
 
 ---
 
 ## 🌟 Features
 
-- **🎯 Real-time License Plate Detection** - High-accuracy plate detection using YOLOv8
+- **🎯 Real-time License Plate Detection** - High-accuracy plate detection using YOLOv11
 - **🔤 Character Recognition** - OCR for reading license plate text
 - **📹 Multi-Source Support** - Local videos, IP cameras (RTSP/HTTP), webcams
-- **⚡ Performance Optimized** - Frame skipping, smart buffering, GPU acceleration
 - **🖥️ Live Preview** - Real-time detection display with bounding boxes
 - **💾 Save Detections** - Capture and save detected plates automatically
-- **🔧 Easy Setup** - Automated installation script for Linux/Raspberry Pi
-- **📊 Performance Metrics** - FPS tracking and detection statistics
-- **🌐 Web Streaming** - Flask-based web interface for remote monitoring
 
 ---
 
@@ -58,7 +54,7 @@ python main.py
 ## 📁 Project Structure
 
 ```
-vlpr/
+vehicle-license-plate-recognition/
 ├── 📄 README.md                    # This file
 ├── 🔧 install_system.sh           # Automated installation script
 ├── 🧪 system_verification.py      # Comprehensive system verification
@@ -201,78 +197,12 @@ python test_setup.py
 
 ---
 
-## 📸 Screenshots
-
-### Main Detection Interface
-![Detection Interface](docs/images/main_interface.png)
-
-### Individual Plate Recognition
-![Plate Recognition](docs/images/plate_recognition.png)
-
-### Web Streaming Dashboard
-![Web Dashboard](docs/images/web_dashboard.png)
-
----
-
-## 🔄 API Reference
-
-### Main Detection Function
-```python
-def run_plate_and_character_models_video(
-    plate_model_path: str,     # Path to plate detection model
-    char_model_path: str,      # Path to character recognition model  
-    source: str,               # Video source (file/camera/stream)
-    conf_thresh: float = 0.5   # Confidence threshold
-):
-    # Real-time detection with optimized performance
-```
-
-### Camera Testing
-```python
-def test_ip_camera(camera_url: str):
-    # Test IP camera connectivity
-    # Returns: bool (connection status)
-```
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md).
-
-### Development Setup
-```bash
-# Fork and clone the repository
-git clone https://github.com/your-username/vehicle-license-plate-recognition.git
-
-# Create development branch
-git checkout -b feature/your-feature-name
-
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Run tests
-python -m pytest tests/
-
-# Submit pull request
-```
-
-### Areas for Contribution
-- 🎯 Model accuracy improvements
-- ⚡ Performance optimizations
-- 🌐 Web interface enhancements
-- 📱 Mobile app development
-- 📚 Documentation improvements
-- 🧪 Additional test cases
-
----
-
 ## 📜 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ### Third-Party Licenses
-- **YOLOv8**: [AGPL-3.0](https://github.com/ultralytics/ultralytics/blob/main/LICENSE)
+- **YOLOv11**: [AGPL-3.0](https://github.com/ultralytics/ultralytics/blob/main/LICENSE)
 - **OpenCV**: [Apache 2.0](https://opencv.org/license/)
 - **PyTorch**: [BSD-3-Clause](https://github.com/pytorch/pytorch/blob/master/LICENSE)
 
@@ -280,43 +210,9 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 🙏 Acknowledgments
 
-- **[Ultralytics](https://github.com/ultralytics/ultralytics)** - YOLOv8 implementation
+- **[Ultralytics](https://github.com/ultralytics/ultralytics)** - YOLOv11 implementation
 - **[OpenCV](https://opencv.org/)** - Computer vision library
 - **[PyTorch](https://pytorch.org/)** - Deep learning framework
-- **Community Contributors** - Bug reports and feature suggestions
 
 ---
 
-## 📊 Performance Benchmarks
-
-| Platform | Model | FPS | Accuracy | Notes |
-|----------|-------|-----|----------|-------|
-| RTX 3080 | YOLOv8n | 45 FPS | 92% | GPU optimized |
-| RTX 3080 | YOLOv8s | 35 FPS | 95% | Best balance |
-| Raspberry Pi 4 | YOLOv8n | 3 FPS | 88% | CPU only |
-| Jetson Nano | YOLOv8n | 8 FPS | 90% | GPU accelerated |
-
----
-
-## 🔗 Related Projects
-
-- [YOLOv8 Official](https://github.com/ultralytics/ultralytics)
-- [OpenCV License Plate Recognition](https://github.com/opencv/opencv)
-- [Automatic Number Plate Recognition](https://github.com/GuiltyNeuron/ANPR)
-
----
-
-## 📈 Roadmap
-
-- [ ] **Mobile App** - React Native/Flutter app
-- [ ] **Cloud API** - RESTful API for detection
-- [ ] **Database Integration** - PostgreSQL/MongoDB support
-- [ ] **Real-time Analytics** - Detection statistics dashboard
-- [ ] **Multi-camera Support** - Simultaneous camera handling
-- [ ] **Edge AI Optimization** - Coral TPU support
-
----
-
-**⭐ Star this repository if you find it helpful!**
-
-**🚗💨 Happy License Plate Detecting!**
