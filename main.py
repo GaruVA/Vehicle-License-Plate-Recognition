@@ -212,6 +212,7 @@ class PlateTracker:
             'B': '8', '8': 'B', 'P': 'B', 'G': 'C', 'C': 'G'
         }
         
+        variations = [plate1]
         for i, char in enumerate(plate1):
             if char in confusions:
                 variation = plate1[:i] + confusions[char] + plate1[i+1:]
