@@ -6,6 +6,10 @@ import time
 import numpy as np
 from collections import defaultdict, deque
 import re
+import requests
+import threading
+import queue
+from datetime import datetime
 
 # Configuration Section - Easy to modify
 CONFIG = {
@@ -18,8 +22,82 @@ CONFIG = {
     'TRACKER_IOU_THRESHOLD': 0.3,
     'FRAME_SKIP': 3,  # Process every 3rd frame for performance
     'SAVE_DETECTIONS': True,
-    'SHOW_INDIVIDUAL_PLATES': True
+    'SHOW_INDIVIDUAL_PLATES': True,
+    
+    # Database Configuration
+    'DATABASE_ENABLED': True,
+    'API_BASE_URL': "http://172.30.30.96:2500/RFID",
+    'DEVICE': '01',         # Camera number (CamereNo)
+    'IN_OUT': 'I',          # Status: I=In, O=Out
+    'DB_ASYNC_MODE': True,
+    'MIN_CONFIDENCE_FOR_DB': 0.7,
 }
+
+class DatabaseManager:
+    def __init__(self, base_url, cam_code, device, in_out):
+        self.base_url = base_url
+        self.cam_code = cam_code
+        self.device = device
+        self.in_out = in_out
+        self.insert_endpoint = f"{base_url}/PostRFID"
+        self.select_endpoint = f"{base_url}/GetCamDetails"
+        
+        self.insert_queue = queue.Queue()
+        self.is_running = True
+        self.insert_thread = threading.Thread(target=self._process_insert_queue, daemon=True)
+        self.insert_thread.start()
+        
+        self.stats = {'total_inserts': 0, 'successful_inserts': 0, 'failed_inserts': 0}
+        print(f"🗄️  Database Manager initialized - Camera {device} ({in_out})")
+    
+    def insert_plate_detection(self, plate_number, confidence, track_id, sync=False):
+        detection_data = {'plate_number': plate_number}
+        
+        if sync:
+            return self._perform_insert(detection_data)
+        else:
+            self.insert_queue.put(detection_data)
+            return True
+    
+    def _perform_insert(self, detection_data):
+        try:
+            params = {
+                'CamCode': detection_data['plate_number'],  # CamCode = VehicleNo (plate number)
+                'Device': self.device,                      # Device = CamereNo (camera number)
+                'InOut': self.in_out                        # InOut = Status (I/O)
+            }
+            
+            response = requests.get(self.insert_endpoint, params=params, timeout=10)
+            self.stats['total_inserts'] += 1
+            
+            if response.status_code in [200, 201]:
+                self.stats['successful_inserts'] += 1
+                print(f"✅ Plate '{detection_data['plate_number']}' saved to database")
+                return True
+            else:
+                self.stats['failed_inserts'] += 1
+                return False
+        except Exception as e:
+            self.stats['failed_inserts'] += 1
+            print(f"❌ Database error: {e}")
+            return False
+    
+    def _process_insert_queue(self):
+        while self.is_running:
+            try:
+                detection_data = self.insert_queue.get(timeout=1)
+                self._perform_insert(detection_data)
+                self.insert_queue.task_done()
+            except queue.Empty:
+                continue
+    
+    def get_stats(self):
+        return self.stats.copy()
+    
+    def shutdown(self):
+        self.is_running = False
+        if self.insert_thread.is_alive():
+            self.insert_thread.join(timeout=2)
 
 class PlateTracker:
     def __init__(self, max_age=30, min_hits=3, iou_threshold=0.3):
@@ -29,6 +107,7 @@ class PlateTracker:
         self.tracks = {}
         self.next_id = 1
         self.frame_count = 0
+        self.saved_to_db = set()  # Track which plates have been saved to database
         
     def update(self, detections):
         self.frame_count += 1
@@ -76,7 +155,8 @@ class PlateTracker:
                 'hits': 1,
                 'last_seen': self.frame_count,
                 'first_seen': self.frame_count,
-                'crop': det['crop']
+                'crop': det['crop'],
+                'saved_to_db': False  # Track database save status
             }
             updated_tracks[self.next_id] = new_track
             self.next_id += 1
@@ -138,6 +218,27 @@ class PlateTracker:
             return max(formatted_plates, key=lambda x: x[1])[0]
         
         return consensus
+
+    def should_save_to_database(self, track):
+        """Check if this track should be saved to database"""
+        return not track.get('saved_to_db', False)
+
+    def should_save_to_database(self, track_id, track):
+        plate_key = f"{track_id}_{track['consensus_text']}"
+        if plate_key in self.saved_to_db:
+            return False
+        
+        if track['hits'] < self.min_hits:
+            return False
+        
+        if not track.get('is_valid', False):
+            return False
+        
+        if track['avg_confidence'] < CONFIG.get('MIN_CONFIDENCE_FOR_DB', 0.7):
+            return False
+        
+        self.saved_to_db.add(plate_key)
+        return True
 
 class SriLankanPlateValidator:
     def __init__(self):
@@ -406,6 +507,10 @@ def run_enhanced_plate_detection():
     print(f"🎯 Plate Model: {os.path.basename(CONFIG['PLATE_MODEL_PATH'])}")
     print(f"🔤 Char Model: {os.path.basename(CONFIG['CHAR_MODEL_PATH'])}")
     print(f"🎛️  Confidence Threshold: {CONFIG['CONFIDENCE_THRESHOLD']}")
+    if CONFIG.get('DATABASE_ENABLED'):
+        print(f"🗄️  Database: ENABLED | Camera: {CONFIG['DEVICE']} | Direction: {CONFIG['IN_OUT']}")
+    else:
+        print(f"🗄️  Database: DISABLED")
     print("=" * 60)
 
     # Load models
@@ -416,6 +521,19 @@ def run_enhanced_plate_detection():
     except Exception as e:
         print(f"❌ Failed to load models: {e}")
         return
+    
+    # Initialize database manager
+    db_manager = None
+    if CONFIG.get('DATABASE_ENABLED', False):
+        try:
+            db_manager = DatabaseManager(
+                base_url=CONFIG['API_BASE_URL'],
+                cam_code='',  # Not used anymore
+                device=CONFIG['DEVICE'],
+                in_out=CONFIG['IN_OUT']
+            )
+        except Exception as e:
+            print(f"⚠️  Database init failed: {e}")
     
     # Initialize tracker and validator
     tracker = PlateTracker(
@@ -588,6 +706,17 @@ def run_enhanced_plate_detection():
         for track_id, track in tracks.items():
             if track['hits'] >= tracker.min_hits:  # Only re-validate mature tracks
                 _, _, track['is_valid'] = validator.validate_and_correct(track['consensus_text'], track['avg_confidence'])
+                
+                # Try to save to database if valid and not already saved
+                if (track.get('is_valid', False) and db_manager and 
+                    not track.get('saved_to_db', False)):
+                    
+                    db_success = db_manager.insert_plate_detection(track['consensus_text'], track['avg_confidence'], track_id)
+                    if db_success:
+                        track['saved_to_db'] = True
+                        print(f"💾 Saved to database: {track['consensus_text']}")
+                    else:
+                        print(f"❌ Database save failed: {track['consensus_text']}")
         
         # Draw tracked plates on frame
         valid_tracks = 0
@@ -604,8 +733,13 @@ def run_enhanced_plate_detection():
             # Draw plate bounding box with track ID and consensus text
             cv2.rectangle(annotated_frame, (x1, y1), (x2, y2), color, 2)
             
-            # Display track info
-            info_text = f"ID:{track_id} {track['consensus_text']} ({track['avg_confidence']:.2f})"
+            # Display track info with database status
+            db_status = ""
+            if (track.get('is_valid', False) and 
+                track.get('saved_to_db', False)):
+                db_status = " [DB]"
+            
+            info_text = f"ID:{track_id} {track['consensus_text']} ({track['avg_confidence']:.2f}){db_status}"
             cv2.putText(annotated_frame, info_text, (x1, y1-10), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
             
